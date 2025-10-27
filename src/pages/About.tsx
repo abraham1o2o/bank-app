@@ -6,7 +6,7 @@ const About: React.FC = () => {
     <div className="page">
       <div className="container">
         <div className="page-header fade-in">
-          <h1>About SecureBank</h1>
+          <h1>About Tazlem Bank</h1>
           <p>Your trusted financial partner for over 50 years</p>
         </div>
 
@@ -16,7 +16,7 @@ const About: React.FC = () => {
             <div className="hero-text">
               <h2>Building Financial Futures Since 1970</h2>
               <p>
-                SecureBank has been at the forefront of financial innovation, providing 
+                Tazlem Bank has been at the forefront of financial innovation, providing 
                 secure, reliable, and personalized banking services to millions of customers 
                 worldwide. We combine traditional banking values with cutting-edge technology 
                 to deliver exceptional financial solutions.
@@ -210,7 +210,7 @@ const About: React.FC = () => {
         {/* Call to Action */}
         <div className="card cta-section fade-in">
           <div className="cta-content">
-            <h2>Ready to Join the SecureBank Family?</h2>
+            <h2>Ready to Join the Tazlem Bank Family?</h2>
             <p>Experience banking reimagined with our innovative solutions and exceptional service.</p>
             <div className="cta-buttons">
               <a href="/register" className="btn btn-primary">

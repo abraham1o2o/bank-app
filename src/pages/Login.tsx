@@ -57,7 +57,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, useMock = false }) => {
           <div className="auth-header">
             <div className="logo">
               <i className="fas fa-university"></i>
-              <h1>SecureBank</h1>
+              <h1>Tazlem Bank</h1>
             </div>
             <p>Welcome back! Please sign in to your account</p>
           </div>

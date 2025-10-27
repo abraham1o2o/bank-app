@@ -79,7 +79,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin, useMock = false }) => {
           <div className="auth-header">
             <div className="logo">
               <i className="fas fa-university"></i>
-              <h1>SecureBank</h1>
+              <h1>Tazlem Bank</h1>
             </div>
             <p>Create your account and start banking with confidence</p>
           </div>
@@ -185,7 +185,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin, useMock = false }) => {
           </form>
 
           <div className="benefits-section">
-            <h3>Why Choose SecureBank?</h3>
+            <h3>Why Choose Tazlem Bank?</h3>
             <div className="benefits">
               <div className="benefit">
                 <i className="fas fa-shield-alt"></i>

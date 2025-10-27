@@ -34,7 +34,7 @@ const Navigation: React.FC<NavigationProps> = ({ isAuthenticated, onLogout }) =>
         <div className="nav-content">
           <Link to="/" className="nav-logo">
             <i className="fas fa-university"></i>
-            <span>SecureBank</span>
+            <span>Tazlem Bank</span>
           </Link>
 
           <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>

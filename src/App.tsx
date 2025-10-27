@@ -49,7 +49,7 @@ function App() {
     return (
       <div className="loading">
         <div className="spinner"></div>
-        Loading SecureBank...
+  Loading Tazlem Bank...
       </div>
     )
   }

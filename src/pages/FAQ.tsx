@@ -9,7 +9,6 @@ interface FAQItem {
 }
 
 const FAQ: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('all')
   const [openItem, setOpenItem] = useState<number | null>(null)
 
   const faqData: FAQItem[] = [
@@ -33,7 +32,7 @@ const FAQ: React.FC = () => {
     },
     {
       id: 4,
-      question: "How secure is my money with SecureBank?",
+      question: "How secure is my money with Tazlem Bank?",
       answer: "Your money is protected by multiple layers of security including FDIC insurance up to $250,000 per account, advanced encryption, fraud monitoring, and secure authentication. We use bank-level security measures to protect your assets.",
       category: "security"
     },
@@ -69,8 +68,8 @@ const FAQ: React.FC = () => {
     },
     {
       id: 10,
-      question: "Can I get a loan or mortgage through SecureBank?",
-      answer: "Yes! We offer personal loans, auto loans, home mortgages, and business loans. Our loan specialists can help you find the right product for your needs. Visit any branch or call 1-800-SECURE-BANK to speak with a loan officer.",
+      question: "Can I get a loan or mortgage through Tazlem Bank?",
+      answer: "Yes! We offer personal loans, auto loans, home mortgages, and business loans. Our loan specialists can help you find the right product for your needs. Visit any branch or call 1-800-TAZLEM-BANK to speak with a loan officer.",
       category: "loans"
     },
     {
@@ -87,20 +86,7 @@ const FAQ: React.FC = () => {
     }
   ]
 
-  const categories = [
-    { id: 'all', name: 'All Questions', icon: 'fas fa-list' },
-    { id: 'account', name: 'Account Management', icon: 'fas fa-user-circle' },
-    { id: 'security', name: 'Security & Safety', icon: 'fas fa-shield-alt' },
-    { id: 'mobile', name: 'Mobile Banking', icon: 'fas fa-mobile-alt' },
-    { id: 'fees', name: 'Fees & Charges', icon: 'fas fa-dollar-sign' },
-    { id: 'payments', name: 'Payments & Transfers', icon: 'fas fa-exchange-alt' },
-    { id: 'loans', name: 'Loans & Credit', icon: 'fas fa-hand-holding-usd' },
-    { id: 'general', name: 'General Banking', icon: 'fas fa-question-circle' }
-  ]
-
-  const filteredFAQs = activeCategory === 'all' 
-    ? faqData 
-    : faqData.filter(faq => faq.category === activeCategory)
+  const filteredFAQs = faqData
 
   const toggleItem = (id: number) => {
     setOpenItem(openItem === id ? null : id)
@@ -126,22 +112,7 @@ const FAQ: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div className="card categories-section fade-in">
-          <h2><i className="fas fa-filter"></i> Browse by Category</h2>
-          <div className="category-grid">
-            {categories.map(category => (
-              <button
-                key={category.id}
-                className={`category-btn ${activeCategory === category.id ? 'active' : ''}`}
-                onClick={() => setActiveCategory(category.id)}
-              >
-                <i className={category.icon}></i>
-                <span>{category.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Category filter removed for simplified FAQ view */}
 
         {/* FAQ Items */}
         <div className="faq-container">
