@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>My Account</h1>
+    <div id="accountInfo"></div>
+    
+    <h2>Deposit</h2>
+    <form id="depositForm">
+        <input type="number" id="depositAmount" placeholder="Amount" required>
+        <button type="submit">Deposit</button>
+    </form>
+    
+    <h2>Transactions</h2>
+    <div id="transactions"></div>
+    
+    <button id="logoutBtn">Logout</button>
+
+    <script>
+        let currentAccountId = null;
+        
+        // Load user accounts on page load
+        async function loadAccounts() {
+            try {
+                const response = await fetch('/accounts/my-accounts');
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    throw new Error('Failed to load accounts');
+                }
+                
+                const accounts = await response.json();
+                const accountInfo = document.getElementById('accountInfo');
+                
+                if (accounts.length === 0) {
+                    accountInfo.innerHTML = '<p>No accounts found</p>';
+                    return;
+                }
+                
+                // Use the first account for now
+                currentAccountId = accounts[0].id;
+                accountInfo.innerHTML = `
+                    <h3>Account #${accounts[0].id}</h3>
+                    <p>Balance: $${parseFloat(accounts[0].balance).toFixed(2)}</p>
+                    <p>Created: ${new Date(accounts[0].created_at).toLocaleDateString()}</p>
+                `;
+                
+                // Load transactions
+                await loadTransactions();
+                
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                document.getElementById('accountInfo').innerHTML = '<p>Error loading account information</p>';
+            }
+        }
+        
+        // Load transactions for current account
+        async function loadTransactions() {
+            if (!currentAccountId) return;
+            
+            try {
+                const response = await fetch(`/accounts/${currentAccountId}/transactions`);
+                if (!response.ok) throw new Error('Failed to load transactions');
+                
+                const transactions = await response.json();
+                const transactionsDiv = document.getElementById('transactions');
+                
+                if (transactions.length === 0) {
+                    transactionsDiv.innerHTML = '<p>No transactions found</p>';
+                    return;
+                }
+                
+                const transactionsHtml = transactions.map(t => `
+                    <div style="border: 1px solid #ccc; padding: 10px; margin: 5px 0;">
+                        <strong>${t.type.toUpperCase()}</strong> - $${parseFloat(t.amount).toFixed(2)}<br>
+                        <small>${t.description || 'No description'}</small><br>
+                        <small>${new Date(t.timestamp).toLocaleString()}</small>
+                    </div>
+                `).join('');
+                
+                transactionsDiv.innerHTML = transactionsHtml;
+                
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactions').innerHTML = '<p>Error loading transactions</p>';
+            }
+        }
+        
+        // Deposit form handler
+        document.getElementById('depositForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentAccountId) {
+                alert('No account selected');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            
+            if (amount <= 0) {
+                alert('Amount must be positive');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/accounts/deposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accountId: currentAccountId, amount })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Deposit successful! New balance: $' + data.NewBalance.toFixed(2));
+                    document.getElementById('depositAmount').value = '';
+                    // Reload account info and transactions
+                    await loadAccounts();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        });
+        
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await fetch('/auth/logout', { method: 'POST' });
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/login.html';
+            }
+        });
+        
+        // Load accounts when page loads
+        loadAccounts();
+    </script>
+</body>
+</html>
