@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { createAccount } from '../demoStore'
 import './Register.css'
 
 interface RegisterProps {
-  onLogin: () => void
+  onLogin: (accountId: string) => void
   useMock?: boolean
 }
 
-const Register: React.FC<RegisterProps> = ({ onLogin, useMock = false }) => {
+const Register: React.FC<RegisterProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     fullName: ''
   })
+  const [passwordError, setPasswordError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -23,30 +25,31 @@ const Register: React.FC<RegisterProps> = ({ onLogin, useMock = false }) => {
       [e.target.name]: e.target.value
     })
     setError('')
+    setPasswordError('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    setPasswordError('')
+
+    // Validate password
+    if (formData.password.length < 8) {
+      setPasswordError('Password must be at least 8 characters')
+      setIsLoading(false)
+      return
+    }
 
     try {
-      const response = await fetch('/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
+      const result = createAccount(formData.email, formData.password, formData.fullName)
+      if (result.success && result.accountId) {
         setSuccess(true)
         setTimeout(() => {
-          onLogin()
+          onLogin(result.accountId!)
         }, 2000)
       } else {
-        setError(data.error || 'Registration failed')
+        setError(result.error || 'Registration failed')
       }
     } catch (error) {
       setError('Network error - please check your connection')
@@ -146,6 +149,12 @@ const Register: React.FC<RegisterProps> = ({ onLogin, useMock = false }) => {
                 {error}
               </div>
             )}
+            {passwordError && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i>
+                {passwordError}
+              </div>
+            )}
 
             <button 
               type="submit" 
@@ -165,19 +174,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin, useMock = false }) => {
               )}
             </button>
 
-            {useMock && (
-              <div className="demo-section">
-                <p className="muted">Backend not available — create a demo account instead.</p>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => onLogin()}
-                >
-                  <i className="fas fa-user"></i>
-                  Use Demo Account
-                </button>
-              </div>
-            )}
+            {/* demo button removed - app uses static local accounts */}
 
             <div className="auth-footer">
               <p>Already have an account? <Link to="/login">Sign in here</Link></p>

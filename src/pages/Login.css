@@ -46,11 +46,11 @@
 
 .logo i {
   font-size: 2.5rem;
-  color: #667eea;
+  color: #3b82f6;
 }
 
 .logo h1 {
-  color: #667eea;
+  color: #1e40af;
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
@@ -86,7 +86,7 @@
 .input-group i {
   position: absolute;
   left: 1rem;
-  color: #667eea;
+  color: #3b82f6;
   font-size: 1rem;
   z-index: 1;
 }
@@ -103,9 +103,9 @@
 
 .input-group .form-control:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3b82f6;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .error-message {
@@ -136,13 +136,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.35);
 }
 
 .btn:disabled {
@@ -161,7 +161,12 @@
 }
 
 .auth-footer a {
-  color: #667eea;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+.auth-footer a {
+  color: #3b82f6;
   text-decoration: none;
   font-weight: 500;
 }
@@ -171,9 +176,17 @@
 }
 
 .forgot-password {
-  color: #667eea;
+  color: #3b82f6;
   text-decoration: none;
   font-size: 0.9rem;
+}
+.forgot-password {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .forgot-password:hover {

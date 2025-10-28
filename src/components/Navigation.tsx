@@ -12,6 +12,27 @@ const Navigation: React.FC<NavigationProps> = ({ isAuthenticated, onLogout }) =>
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const location = useLocation()
 
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.nav-menu') && !target.closest('.nav-toggle')) {
+        setIsMenuOpen(false);
+      }
+      if (!target.closest('.nav-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Close menu and dropdown when route changes
+  React.useEffect(() => {
+    setIsMenuOpen(false);
+    setIsDropdownOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     try {
       await fetch('/auth/logout', { 

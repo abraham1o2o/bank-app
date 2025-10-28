@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Login.css'
+import { authenticate } from '../demoStore'
 
 interface LoginProps {
-  onLogin: () => void
+  onLogin: (accountId: string) => void
   useMock?: boolean
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, useMock = false }) => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -29,19 +30,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, useMock = false }) => {
     setError('')
 
     try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        onLogin()
+      // Authenticate against static demo store (no backend)
+      const res = authenticate(formData.email, formData.password)
+      if (res.success && res.accountId) {
+        onLogin(res.accountId)
       } else {
-        setError(data.error || 'Login failed')
+        setError(res.error || 'Login failed')
       }
     } catch (error) {
       setError('Network error - please check your connection')
@@ -122,19 +116,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, useMock = false }) => {
               )}
             </button>
 
-            {useMock && (
-              <div className="demo-section">
-                <p className="muted">Backend not available — you can try the demo account.</p>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => onLogin()}
-                >
-                  <i className="fas fa-user"></i>
-                  Use Demo Account
-                </button>
-              </div>
-            )}
+            {/* demo button removed - app uses static local accounts */}
 
             <div className="auth-footer">
               <p>Don't have an account? <Link to="/register">Create one here</Link></p>

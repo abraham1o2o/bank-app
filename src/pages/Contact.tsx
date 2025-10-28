@@ -45,75 +45,33 @@ const Contact: React.FC = () => {
           <p>We're here to help! Get in touch with our team</p>
         </div>
 
-        <div className="grid grid-2">
-          {/* Contact Information */}
-          <div className="card fade-in">
-            <h2><i className="fas fa-map-marker-alt"></i> Get in Touch</h2>
-            
-            <div className="contact-info">
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <i className="fas fa-building"></i>
-                </div>
-                <div className="contact-details">
-                  <h3>Headquarters</h3>
-                  <p>123 Financial District<br />New York, NY 10004</p>
-                </div>
-              </div>
+        {/* Quick Contact Methods */}
+        <div className="quick-contact-section fade-in">
+          <a href="tel:+15551234567" className="card">
+            <i className="fas fa-phone-volume"></i>
+            <h3>Call Us</h3>
+            <p>+1 (555) 123-4567</p>
+            <span className="contact-badge">24/7 Support</span>
+          </a>
 
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <i className="fas fa-phone"></i>
-                </div>
-                <div className="contact-details">
-                  <h3>Phone</h3>
-                  <p>+1 (555) 123-4567<br />Mon-Fri: 8AM-8PM EST</p>
-                </div>
-              </div>
+          <a href="mailto:support@tazlembank.com" className="card">
+            <i className="fas fa-envelope"></i>
+            <h3>Email Us</h3>
+            <p>support@tazlembank.com</p>
+            <span className="contact-badge">Response within 24h</span>
+          </a>
 
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <i className="fas fa-envelope"></i>
-                </div>
-                <div className="contact-details">
-                  <h3>Email</h3>
-                  <p>support@securebank.com<br />info@securebank.com</p>
-                </div>
-              </div>
-
-              <div className="contact-item">
-                <div className="contact-icon">
-                  <i className="fas fa-clock"></i>
-                </div>
-                <div className="contact-details">
-                  <h3>Business Hours</h3>
-                  <p>Monday - Friday: 8:00 AM - 8:00 PM<br />Saturday: 9:00 AM - 5:00 PM<br />Sunday: Closed</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="social-links">
-              <h3>Follow Us</h3>
-              <div className="social-icons">
-                <a href="#" className="social-link">
-                  <i className="fab fa-facebook"></i>
-                </a>
-                <a href="#" className="social-link">
-                  <i className="fab fa-twitter"></i>
-                </a>
-                <a href="#" className="social-link">
-                  <i className="fab fa-linkedin"></i>
-                </a>
-                <a href="#" className="social-link">
-                  <i className="fab fa-instagram"></i>
-                </a>
-              </div>
-            </div>
+          <div className="card">
+            <i className="fas fa-comments"></i>
+            <h3>Live Chat</h3>
+            <p>Start a conversation now</p>
+            <span className="contact-badge">Online</span>
           </div>
+        </div>
 
-          {/* Contact Form */}
-          <div className="card fade-in">
-            <h2><i className="fas fa-paper-plane"></i> Send us a Message</h2>
+        {/* Contact Form */}
+        <div className="card contact-form-section fade-in">
+          <h2><i className="fas fa-paper-plane"></i> Send us a Message</h2>
             
             {submitStatus === 'success' && (
               <div className="alert alert-success">
@@ -215,24 +173,23 @@ const Contact: React.FC = () => {
                 )}
               </button>
             </form>
-          </div>
         </div>
 
-        {/* Additional Information */}
+        {/* Business Hours */}
         <div className="card fade-in">
-          <h2><i className="fas fa-info-circle"></i> Additional Information</h2>
-          <div className="grid grid-3">
-            <div className="info-section">
-              <h3><i className="fas fa-shield-alt"></i> Security</h3>
-              <p>Your personal information is protected with bank-level security. We never share your data with third parties.</p>
+          <h2><i className="fas fa-clock"></i> Business Hours</h2>
+          <div className="hours-grid">
+            <div className="hours-item">
+              <span>Monday - Friday</span>
+              <span>8:00 AM - 8:00 PM</span>
             </div>
-            <div className="info-section">
-              <h3><i className="fas fa-headset"></i> Support</h3>
-              <p>Our customer support team is available 24/7 for urgent matters. Non-urgent inquiries are responded to within 24 hours.</p>
+            <div className="hours-item">
+              <span>Saturday</span>
+              <span>9:00 AM - 5:00 PM</span>
             </div>
-            <div className="info-section">
-              <h3><i className="fas fa-mobile-alt"></i> Mobile App</h3>
-              <p>Download our mobile app for instant access to your accounts and quick customer support through in-app chat.</p>
+            <div className="hours-item">
+              <span>Sunday</span>
+              <span>Closed</span>
             </div>
           </div>
         </div>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import CardDetails from '../components/CardDetails'
+import { deposit as demoDeposit, withdraw as demoWithdraw, getStore } from '../demoStore'
 import './Dashboard.css'
-import { demoAccounts, demoTransactions } from '../mockData.ts'
 
 interface Account {
   id: string
+  name?: string
   balance: number
-  created_at: string
 }
 
 interface Transaction {
@@ -14,12 +15,22 @@ interface Transaction {
   amount: number
   description: string
   timestamp: string
+  accountId?: string
 }
 
-const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
+const DEMO_STORAGE_KEY = 'demo_bank_v1'
+
+interface DemoStore {
+  accounts: Account[]
+  transactions: Transaction[]
+}
+
+const Dashboard: React.FC<{ useMock?: boolean; currentAccountId?: string }> = ({ useMock = false, currentAccountId: initialAccountId }) => {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [currentAccountId, setCurrentAccountId] = useState<string | null>(null)
+  const [showCardDetails, setShowCardDetails] = useState<'deposit' | 'withdraw' | null>(null)
+  const [pendingAmount, setPendingAmount] = useState<number>(0)
   const [loading, setLoading] = useState(true)
   const [depositAmount, setDepositAmount] = useState('')
   const [withdrawAmount, setWithdrawAmount] = useState('')
@@ -31,12 +42,44 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
 
   const loadAccounts = async () => {
     if (useMock) {
-      // Use demo data when in mock mode
-      setAccounts(demoAccounts as unknown as Account[])
-      if (demoAccounts.length > 0) {
-        setCurrentAccountId(demoAccounts[0].id)
-        setTransactions(demoTransactions as unknown as Transaction[])
+      // Use localStorage-backed demo data when in mock mode
+      const storeRaw = localStorage.getItem(DEMO_STORAGE_KEY)
+      let store: DemoStore | null = null
+
+      if (storeRaw) {
+        try {
+          store = JSON.parse(storeRaw) as DemoStore
+        } catch (err) {
+          console.warn('Failed to parse demo store, reseeding', err)
+        }
       }
+
+      if (!store || !Array.isArray(store.accounts) || store.accounts.length === 0) {
+        // Seed with two static users John and Ben with $1000 balance
+        store = {
+          accounts: [
+            { id: 'acct-john', name: 'John', balance: 1000 },
+            { id: 'acct-ben', name: 'Ben', balance: 1000 }
+          ],
+          transactions: []
+        }
+        localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(store))
+      }
+
+      if (store) {
+        // Only expose the logged-in account (don't show other accounts)
+        if (initialAccountId) {
+          setAccounts(store.accounts.filter(a => a.id === initialAccountId))
+          setCurrentAccountId(initialAccountId)
+          setTransactions(store.transactions.filter(t => (t as any).accountId === initialAccountId))
+        } else {
+          // no account supplied by app - keep dashboard empty (requires login)
+          setAccounts([])
+          setCurrentAccountId(null)
+          setTransactions([])
+        }
+      }
+
       setLoading(false)
       return
     }
@@ -70,7 +113,19 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
 
   const loadTransactions = async (accountId: string) => {
     if (useMock) {
-      setTransactions(demoTransactions as unknown as Transaction[])
+      const storeRaw = localStorage.getItem(DEMO_STORAGE_KEY)
+      if (storeRaw) {
+        try {
+          const store = JSON.parse(storeRaw) as DemoStore
+          const txs = store.transactions.filter(t => (t as any).accountId === accountId)
+          setTransactions(txs)
+        } catch (err) {
+          console.warn('Failed to parse demo transactions', err)
+          setTransactions([])
+        }
+      } else {
+        setTransactions([])
+      }
       return
     }
 
@@ -97,40 +152,10 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
       alert('Amount must be positive')
       return
     }
-
-    setIsProcessing(true)
-    try {
-      if (useMock) {
-        // Update mock balance locally
-        setAccounts(prev => prev.map(a => a.id === currentAccountId ? { ...a, balance: a.balance + amount } : a))
-        setTransactions(prev => [{ id: `m-${Date.now()}`, type: 'deposit', amount, description: 'Demo deposit', timestamp: new Date().toISOString() }, ...prev])
-        setDepositAmount('')
-        setIsProcessing(false)
-        return
-      }
-
-      const response = await fetch('/accounts/deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ accountId: currentAccountId, amount })
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        alert(`Deposit successful! New balance: $${data.NewBalance.toFixed(2)}`)
-        setDepositAmount('')
-        await loadAccounts()
-        await loadTransactions(currentAccountId)
-      } else {
-        alert('Error: ' + data.error)
-      }
-    } catch (error) {
-      alert('Network error: ' + (error as Error).message)
-    } finally {
-      setIsProcessing(false)
-    }
+    // open card details modal as the payment source
+    setPendingAmount(amount)
+    setShowCardDetails('deposit')
+    setDepositAmount('')
   }
 
   const handleWithdraw = async (e: React.FormEvent) => {
@@ -142,35 +167,46 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
       alert('Amount must be positive')
       return
     }
+    const acct = accounts.find(a => a.id === currentAccountId)
+    if (acct && amount > acct.balance) {
+      alert('Insufficient funds')
+      return
+    }
 
+    // open card details modal as the withdrawal source
+    setPendingAmount(amount)
+    setShowCardDetails('withdraw')
+    setWithdrawAmount('')
+  }
+
+  const handleCardDetailsSubmit = async (cardDetails: any) => {
+    if (!currentAccountId) return
     setIsProcessing(true)
     try {
       if (useMock) {
-        // Update mock balance locally
-        setAccounts(prev => prev.map(a => a.id === currentAccountId ? { ...a, balance: a.balance - amount } : a))
-        setTransactions(prev => [{ id: `m-${Date.now()}`, type: 'withdraw', amount, description: 'Demo withdrawal', timestamp: new Date().toISOString() }, ...prev])
-        setWithdrawAmount('')
-        setIsProcessing(false)
+        if (showCardDetails === 'deposit') {
+          demoDeposit(currentAccountId, pendingAmount, `Card deposit - ****${cardDetails.cardNumber.slice(-4)}`)
+        } else {
+          const res = demoWithdraw(currentAccountId, pendingAmount, `Card withdrawal - ****${cardDetails.cardNumber.slice(-4)}`)
+          if ((res as any).success === false) {
+            alert((res as any).error || 'Withdrawal failed')
+            setIsProcessing(false)
+            return
+          }
+        }
+
+        // Refresh local view from store
+        const store = getStore()
+        setAccounts(store.accounts.filter(a => a.id === currentAccountId))
+        setTransactions(store.transactions.filter(t => t.accountId === currentAccountId))
+        setShowCardDetails(null)
+        alert(`${showCardDetails === 'deposit' ? 'Deposit' : 'Withdrawal'} successful!`)
         return
       }
 
-      const response = await fetch('/accounts/withdraw', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ accountId: currentAccountId, amount })
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        alert(`Withdrawal successful! New balance: $${data.NewBalance.toFixed(2)}`)
-        setWithdrawAmount('')
-        await loadAccounts()
-        await loadTransactions(currentAccountId)
-      } else {
-        alert('Error: ' + data.error)
-      }
+      // TODO: call real API endpoint to process card-based deposit/withdrawal
+      alert('Transaction submitted (demo mode off)')
+      setShowCardDetails(null)
     } catch (error) {
       alert('Network error: ' + (error as Error).message)
     } finally {
@@ -197,30 +233,18 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
     <div className="page">
       <div className="container">
         <div className="page-header fade-in">
-          <h1>Welcome to Your Dashboard</h1>
-          <p>Manage your finances with ease and security</p>
+          <h1>Welcome to Your Account{currentAccount?.name ? `, ${currentAccount.name}` : ''}</h1>
+          <p>Your trusted banking partner for secure and easy transactions</p>
         </div>
 
         {/* Account Overview */}
         <div className="card account-overview fade-in">
           <div className="account-header">
             <h2><i className="fas fa-wallet"></i> Account Overview</h2>
-            {accounts.length > 1 && (
-              <select 
-                value={currentAccountId || ''} 
-                onChange={(e) => {
-                  setCurrentAccountId(e.target.value)
-                  loadTransactions(e.target.value)
-                }}
-                className="account-selector"
-              >
-                {accounts.map(account => (
-                  <option key={account.id} value={account.id}>
-                    Account #{account.id}
-                  </option>
-                ))}
-              </select>
-            )}
+            <div className="last-login">
+              <i className="fas fa-clock"></i>
+              Last login: {new Date().toLocaleString()}
+            </div>
           </div>
 
           {currentAccount ? (
@@ -230,16 +254,11 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
                 <div className="balance-amount">
                   ${parseFloat(currentAccount.balance.toString()).toFixed(2)}
                 </div>
+                <p>Account Holder: {currentAccount.name || currentAccount.id}</p>
                 <p>Account #{currentAccount.id}</p>
               </div>
               <div className="account-info">
-                <div className="info-item">
-                  <i className="fas fa-calendar"></i>
-                  <div>
-                    <span>Account Created</span>
-                    <strong>{new Date(currentAccount.created_at).toLocaleDateString()}</strong>
-                  </div>
-                </div>
+                {/* Created date removed for privacy */}
                 <div className="info-item">
                   <i className="fas fa-chart-line"></i>
                   <div>
@@ -260,85 +279,96 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
 
         {/* Quick Actions */}
         <div className="grid grid-2">
-          <div className="card transaction-card fade-in">
-            <h2><i className="fas fa-plus-circle"></i> Make a Deposit</h2>
-            <form onSubmit={handleDeposit} className="transaction-form">
-              <div className="form-group">
-                <label htmlFor="depositAmount">Amount</label>
-                <div className="input-group">
-                  <span className="input-prefix">$</span>
-                  <input
-                    type="number"
-                    id="depositAmount"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    className="form-control"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0.01"
-                    required
-                  />
-                </div>
+          <div className="transaction-cards-container fade-in">
+            <div className="card transaction-card deposit-card">
+              <div className="transaction-card-header">
+                <i className="fas fa-plus-circle"></i>
+                <h2>Make a Deposit</h2>
+                <p>Add funds to your account</p>
               </div>
-              <button 
-                type="submit" 
-                className="btn btn-primary"
-                disabled={isProcessing || !currentAccountId}
-              >
-                {isProcessing ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-plus"></i>
-                    Deposit Funds
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+              <form onSubmit={handleDeposit} className="transaction-form">
+                <div className="form-group">
+                  <label htmlFor="depositAmount">Enter Amount to Deposit</label>
+                  <div className="input-group">
+                    <span className="input-prefix">$</span>
+                    <input
+                      type="number"
+                      id="depositAmount"
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(e.target.value)}
+                      className="form-control"
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0.01"
+                      required
+                    />
+                  </div>
+                </div>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={isProcessing || !currentAccountId}
+                >
+                  {isProcessing ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-plus"></i>
+                      Deposit Funds
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
 
-          <div className="card transaction-card fade-in">
-            <h2><i className="fas fa-minus-circle"></i> Make a Withdrawal</h2>
-            <form onSubmit={handleWithdraw} className="transaction-form">
-              <div className="form-group">
-                <label htmlFor="withdrawAmount">Amount</label>
-                <div className="input-group">
-                  <span className="input-prefix">$</span>
-                  <input
-                    type="number"
-                    id="withdrawAmount"
-                    value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    className="form-control"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0.01"
-                    max={currentAccount?.balance || 0}
-                    required
-                  />
-                </div>
+            <div className="card transaction-card withdraw-card">
+              <div className="transaction-card-header">
+                <i className="fas fa-minus-circle"></i>
+                <h2>Make a Withdrawal</h2>
+                <p>Withdraw funds from your account</p>
               </div>
-              <button 
-                type="submit" 
-                className="btn btn-danger"
-                disabled={isProcessing || !currentAccountId}
-              >
-                {isProcessing ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-minus"></i>
-                    Withdraw Funds
-                  </>
-                )}
-              </button>
-            </form>
+              <form onSubmit={handleWithdraw} className="transaction-form">
+                <div className="form-group">
+                  <label htmlFor="withdrawAmount">Enter Amount to Withdraw</label>
+                  <div className="input-group">
+                    <span className="input-prefix">$</span>
+                    <input
+                      type="number"
+                      id="withdrawAmount"
+                      value={withdrawAmount}
+                      onChange={(e) => setWithdrawAmount(e.target.value)}
+                      className="form-control"
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0.01"
+                      max={currentAccount?.balance || 0}
+                      required
+                    />
+                  </div>
+                  <span className="balance-note">Available Balance: ${currentAccount?.balance.toFixed(2) || '0.00'}</span>
+                </div>
+                <button 
+                  type="submit" 
+                  className="btn btn-outline"
+                  disabled={isProcessing || !currentAccountId}
+                >
+                  {isProcessing ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-minus"></i>
+                      Withdraw Funds
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
 
@@ -377,16 +407,8 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
         {/* Quick Stats */}
         <div className="card stats-section fade-in">
           <h2><i className="fas fa-chart-bar"></i> Quick Statistics</h2>
-          <div className="grid grid-4">
-            <div className="stat-item">
-              <div className="stat-icon">
-                <i className="fas fa-wallet"></i>
-              </div>
-              <div className="stat-content">
-                <h3>{accounts.length}</h3>
-                <p>Total Accounts</p>
-              </div>
-            </div>
+          <div className="grid grid-3">
+            {/* Total Accounts stat removed for privacy */}
             <div className="stat-item">
               <div className="stat-icon">
                 <i className="fas fa-arrow-up"></i>
@@ -420,6 +442,15 @@ const Dashboard: React.FC<{ useMock?: boolean }> = ({ useMock = false }) => {
             </div>
           </div>
         </div>
+        {/* Card Details Modal (source verification for deposit/withdraw) */}
+        {showCardDetails && (
+          <CardDetails
+            type={showCardDetails}
+            amount={pendingAmount}
+            onSubmit={handleCardDetailsSubmit}
+            onCancel={() => setShowCardDetails(null)}
+          />
+        )}
       </div>
     </div>
   )

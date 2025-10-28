@@ -114,24 +114,41 @@ const FAQ: React.FC = () => {
 
         {/* Category filter removed for simplified FAQ view */}
 
+
+
         {/* FAQ Items */}
         <div className="faq-container">
           {filteredFAQs.map((faq, index) => (
             <div 
               key={faq.id} 
-              className={`card faq-item fade-in`}
+              className={`faq-item fade-in ${openItem === faq.id ? 'active' : ''}`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <button 
                 className="faq-question"
                 onClick={() => toggleItem(faq.id)}
               >
-                <h3>{faq.question}</h3>
-                <i className={`fas fa-chevron-down ${openItem === faq.id ? 'rotated' : ''}`}></i>
+                <div className="question-content">
+                  <span className="category-tag">{faq.category}</span>
+                  <h3>{faq.question}</h3>
+                </div>
+                <div className="question-icon">
+                  <i className={`fas fa-chevron-down ${openItem === faq.id ? 'rotated' : ''}`}></i>
+                </div>
               </button>
               
               <div className={`faq-answer ${openItem === faq.id ? 'open' : ''}`}>
                 <p>{faq.answer}</p>
+                <div className="answer-actions">
+                  <button className="action-btn">
+                    <i className="fas fa-thumbs-up"></i>
+                    Helpful
+                  </button>
+                  <button className="action-btn">
+                    <i className="fas fa-share"></i>
+                    Share
+                  </button>
+                </div>
               </div>
             </div>
           ))}

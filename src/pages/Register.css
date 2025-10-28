@@ -46,11 +46,11 @@
 
 .logo i {
   font-size: 2.5rem;
-  color: #667eea;
+  color: #3b82f6;
 }
 
 .logo h1 {
-  color: #667eea;
+  color: #1e40af;
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
@@ -86,7 +86,7 @@
 .input-group i {
   position: absolute;
   left: 1rem;
-  color: #667eea;
+  color: #3b82f6;
   font-size: 1rem;
   z-index: 1;
 }
@@ -103,9 +103,9 @@
 
 .input-group .form-control:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3b82f6;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
 }
 
 .password-requirements {
@@ -146,7 +146,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: white;
 }
 
@@ -171,7 +171,7 @@
 }
 
 .auth-footer a {
-  color: #667eea;
+  color: #3b82f6;
   text-decoration: none;
   font-weight: 500;
 }
@@ -203,18 +203,18 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(59,130,246,0.05);
   border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .benefit:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(59,130,246,0.1);
   transform: translateY(-2px);
 }
 
 .benefit i {
-  color: #667eea;
+  color: #3b82f6;
   font-size: 1.5rem;
   margin-top: 0.25rem;
   flex-shrink: 0;
@@ -262,8 +262,8 @@
 .success-card .spinner {
   width: 30px;
   height: 30px;
-  border: 3px solid rgba(102, 126, 234, 0.3);
-  border-top: 3px solid #667eea;
+  border: 3px solid rgba(59,130,246,0.3);
+  border-top: 3px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;

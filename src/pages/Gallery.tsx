@@ -14,55 +14,55 @@ const Gallery: React.FC = () => {
   // Category filtering removed; simplified gallery
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
 
-  // Reduced set of placeholder images for lightweight gallery
+  // High-quality online images for the gallery
   const galleryImages: GalleryImage[] = [
     {
       id: 1,
-      src: '/images/bank-exterior.jpg',
-      alt: 'Main Branch Exterior',
-      title: 'Main Branch Exterior',
+      src: 'https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?auto=format&w=800',
+      alt: 'Modern Bank Building',
+      title: 'Contemporary Banking Center',
       category: 'branches',
-      description: 'Flagship branch with modern architecture.'
+      description: 'Our flagship branch featuring stunning glass architecture and sustainable design.'
     },
     {
       id: 2,
-      src: '/images/bank-lobby.jpg',
-      alt: 'Bank Lobby Interior',
-      title: 'Modern Lobby Design',
-      category: 'interior',
-      description: 'Spacious and welcoming lobby.'
+      src: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?auto=format&w=800',
+      alt: 'Digital Banking Interface',
+      title: 'Digital Banking Solutions',
+      category: 'technology',
+      description: 'State-of-the-art digital banking systems for seamless transactions.'
     },
     {
       id: 3,
-      src: '/images/atm-center.jpg',
-      alt: 'ATM Banking Center',
-      title: '24/7 ATM Center',
+      src: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&w=800',
+      alt: 'Modern ATM Facility',
+      title: '24/7 Smart ATMs',
       category: 'services',
-      description: 'Convenient ATM services available round the clock.'
+      description: 'Advanced ATMs with contactless technology and smart features.'
     },
     {
       id: 4,
-      src: '/images/drive-thru.jpg',
-      alt: 'Drive-Thru Banking',
-      title: 'Drive-Thru Services',
+      src: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&w=800',
+      alt: 'Business Meeting',
+      title: 'Financial Consulting',
       category: 'services',
-      description: 'Quick transactions without leaving your vehicle.'
+      description: 'Expert financial advisors helping you make informed decisions.'
     },
     {
       id: 5,
-      src: '/images/community-event.jpg',
-      alt: 'Community Event',
-      title: 'Community Outreach',
-      category: 'community',
-      description: 'Engaging with the community through events.'
+      src: 'https://images.unsplash.com/photo-1579621970590-9d624316904b?auto=format&w=800',
+      alt: 'Mobile Banking',
+      title: 'Mobile Banking App',
+      category: 'technology',
+      description: 'Banking at your fingertips with our secure mobile application.'
     },
     {
       id: 6,
-      src: '/images/award-ceremony.jpg',
-      alt: 'Award Ceremony',
-      title: 'Industry Recognition',
-      category: 'achievements',
-      description: 'Recognized for excellence in banking services.'
+      src: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?auto=format&w=800',
+      alt: 'Secure Vault',
+      title: 'Advanced Security',
+      category: 'security',
+      description: 'State-of-the-art security systems protecting your assets.'
     }
   ]
 
@@ -95,14 +95,19 @@ const Gallery: React.FC = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
               onClick={() => openModal(image)}
             >
-              <div className="image-placeholder">
-                <i className="fas fa-image"></i>
-                <p>Click to view</p>
-              </div>
+              <img 
+                src={image.src} 
+                alt={image.alt} 
+                loading="lazy"
+                className="gallery-image"
+              />
               <div className="image-overlay">
                 <h3>{image.title}</h3>
                 <p>{image.description}</p>
-                {/* No category badge in simplified gallery */}
+                <span className="category-badge">
+                  <i className="fas fa-tag"></i>
+                  {image.category}
+                </span>
               </div>
             </div>
           ))}
@@ -113,28 +118,7 @@ const Gallery: React.FC = () => {
           <p>Showing {filteredImages.length} of {galleryImages.length} images</p>
         </div>
 
-        {/* Virtual Tour Section */}
-        <div className="card virtual-tour-section fade-in">
-          <div className="tour-content">
-            <div className="tour-text">
-              <h2><i className="fas fa-vr-cardboard"></i> Take a Virtual Tour</h2>
-              <p>
-                Experience our facilities from the comfort of your home. Take an interactive 
-                virtual tour of our main branch and see what makes SecureBank special.
-              </p>
-              <button className="btn btn-primary">
-                <i className="fas fa-play"></i>
-                Start Virtual Tour
-              </button>
-            </div>
-            <div className="tour-preview">
-              <div className="tour-placeholder">
-                <i className="fas fa-vr-cardboard"></i>
-                <p>360° Virtual Experience</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Virtual tour removed per request */}
 
         {/* Image Modal */}
         {selectedImage && (
@@ -144,10 +128,11 @@ const Gallery: React.FC = () => {
                 <i className="fas fa-times"></i>
               </button>
               <div className="modal-image">
-                <div className="modal-placeholder">
-                  <i className="fas fa-image"></i>
-                  <p>Image: {selectedImage.title}</p>
-                </div>
+                <img 
+                  src={selectedImage.src} 
+                  alt={selectedImage.alt} 
+                  className="modal-img"
+                />
               </div>
               <div className="modal-info">
                 <h3>{selectedImage.title}</h3>
