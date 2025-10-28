@@ -46,19 +46,33 @@
 }
 
 .card-front {
-  background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(120deg, #4f46e5, #2563eb);
+  background-image: 
+    radial-gradient(circle at 0% 0%, rgba(255,255,255,0.15) 0%, transparent 25%),
+    radial-gradient(circle at 100% 100%, rgba(255,255,255,0.15) 0%, transparent 25%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 5%, transparent 5%, transparent 10%);
   border-radius: 15px;
   padding: 1.2rem;
   position: relative;
   color: white;
   min-height: 160px;
   margin-bottom: 1.5rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(79, 70, 229, 0.2);
   max-width: 340px;
   margin-left: auto;
   margin-right: auto;
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M0 0h200v200H0z" fill="none"/><path d="M50 50h100v100H50z" fill="rgba(255,255,255,0.1)"/></svg>'), linear-gradient(45deg, #3b82f6, #1d4ed8);
-  background-size: cover;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(5px);
+  transition: transform 0.3s ease;
+}
+
+.card-front:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(79, 70, 229, 0.3);
 }
 
 .card-type {

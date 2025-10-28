@@ -82,7 +82,7 @@ const CardDetails: React.FC<CardDetailsProps> = ({ onSubmit, onCancel, type, amo
           <div className="credit-card-display">
           <div className="card-front">
             <div className="card-type">
-              <img src="/src/assets/card-chip.png" alt="Chip" className="chip-image" />
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0iI2ZmZCI+PHBhdGggZD0iTTggOGgzMnYzMkg4eiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkNzAwIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTIgMTJoMjR2MjRIMTJ6IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmQ3MDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" alt="Chip" className="chip-image" />
               <i className="fas fa-wifi rotate-90"></i>
             </div>
             <div className="card-number">
