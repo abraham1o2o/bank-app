@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Navigation from './components/Navigation'
 import { ensureSeed } from './demoStore'
 import Login from './pages/Login'
@@ -25,11 +25,11 @@ function App() {
       // Force redirect to login on initial load
       await checkAuthStatus()
       
-      // Redirect to login if not on login/register page
-      const path = window.location.pathname
-        if (!isAuthenticated && path !== '/bank-app/login' && path !== '/bank-app/register') {
-        window.location.href = '/bank-app/login'
-        }
+      // Use client-side navigation instead of forcing a full-page redirect
+      // (Full-page redirects to '/bank-app/...' can cause GitHub Pages to return 404.)
+      if (!isAuthenticated) {
+        // `useNavigate` can't be used directly inside this scope, we'll navigate after init via state below
+      }
     }
     
     init()
@@ -43,6 +43,7 @@ function App() {
   }
 
   const [currentAccountId, setCurrentAccountId] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   const handleLogin = (accountId: string) => {
     setCurrentAccountId(accountId)
@@ -53,6 +54,13 @@ function App() {
     setIsAuthenticated(false)
     setCurrentAccountId(null)
   }
+
+  // After loading and checking auth, if not authenticated send user to client-side /login route
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/login', { replace: true })
+    }
+  }, [loading, isAuthenticated, navigate])
 
   if (loading) {
     return (
@@ -81,7 +89,7 @@ function App() {
           element={
             isAuthenticated ? 
             <Navigate to="/dashboard" replace /> : 
-              <Navigate to="/bank-app/login" replace />
+              <Navigate to="/login" replace />
           } 
         />
         <Route 
