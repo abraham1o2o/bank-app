@@ -73,16 +73,6 @@ const CardDetails: React.FC<CardDetailsProps> = ({ onSubmit, onCancel, type, amo
   return (
     <div className="card-details-modal">
         <div className="card-details-content">
-          <div className="demo-notice">
-            <i className="fas fa-info-circle"></i>
-            For testing, you can use this demo card:
-            <div className="demo-card-details">
-              <div>Card: 4532 0123 4567 8901</div>
-              <div>Expiry: 12/25</div>
-              <div>CVV: 123</div>
-              <div>Name: DEMO USER</div>
-            </div>
-          </div>
 
           <div className="amount-display">
             <span>{type === 'deposit' ? 'Deposit' : 'Withdraw'} Amount: </span>

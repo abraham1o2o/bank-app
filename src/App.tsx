@@ -97,7 +97,7 @@ function App() {
           element={
             isAuthenticated ? 
             <Navigate to="/dashboard" replace /> : 
-              <Navigate to="/login" replace />
+            <Register onLogin={handleLogin} useMock={useMock} />
           } 
         />
         <Route 
