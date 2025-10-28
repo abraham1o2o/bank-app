@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import Navigation from './components/Navigation'
 import { ensureSeed } from './demoStore'
 import Login from './pages/Login'
@@ -55,12 +55,20 @@ function App() {
     setCurrentAccountId(null)
   }
 
-  // After loading and checking auth, if not authenticated send user to client-side /login route
+  // After loading and checking auth, navigate to /login only when user is trying to access a protected route
+  const location = useLocation()
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      navigate('/login', { replace: true })
+      // Allow these public routes without forcing login
+      const publicPaths = ['/', '/login', '/register', '/about', '/contact', '/faq', '/gallery']
+      const path = location.pathname || '/'
+      const isPublic = publicPaths.some(p => path.endsWith(p))
+      if (!isPublic) {
+        navigate('/login', { replace: true })
+      }
     }
-  }, [loading, isAuthenticated, navigate])
+  }, [loading, isAuthenticated, navigate, location])
 
   if (loading) {
     return (
