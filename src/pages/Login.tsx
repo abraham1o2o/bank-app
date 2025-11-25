@@ -120,7 +120,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
             <div className="auth-footer">
               <p>Don't have an account? <Link to="/register">Create one here</Link></p>
-              <a href="#" className="forgot-password">Forgot your password?</a>
             </div>
           </form>
 
